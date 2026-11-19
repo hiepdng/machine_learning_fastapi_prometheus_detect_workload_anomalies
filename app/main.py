@@ -3,9 +3,9 @@ from prometheus_api_client import PrometheusConnect
 import pandas as pd
 from datetime import datetime, timedelta
 from sklearn.ensemble import IsolationForest
-
-import time
-from prometheus_client import  Histogram, Counter, Gauge, make_asgi_app
+from sklearn.linear_model import LinearRegression
+import numpy as np
+from prometheus_client import Gauge, make_asgi_app
 
 app = FastAPI()
 
@@ -13,29 +13,13 @@ app = FastAPI()
 ANOMALY_SCORE = Gauge("ml_cpu_anomaly_flag", "1 if anomaly detected, 0 otherwise")
 PREDICTED_CPU = Gauge("ml_cpu_predicted_value", "Predicted CPU usage")
 
-
 prom = PrometheusConnect(url="http://prometheus_node:9090", disable_ssl=True)
 
-###There are three methods to expose standard HTTP metrics at /metrics:
-### 1:
-### from prometheus_client import start_http_server
-### start_http_server(8001)        <-you need to expose port 8001 at Dockerfile
-### 2:
-### from prometheus_client import start_http_server
-### from prometheus_fastapi_instrumentator import Instrumentator
-### Instrumentator().instrument(app).expose(app)
-### 3: below
 metrics_app = make_asgi_app()
 app.mount("/metrics", metrics_app)
 
-
 @app.get("/detect-anomalies")
-#def detect_anomalies(query: str = "rate(http_requests_total[5m])"):
-#def detect_anomalies(query: str = "rate(node_cpu_seconds_total{mode='system'}[5m])"):
-def detect_anomalies(query: str = "sum by (instance, mode) (rate(node_cpu_seconds_total[5m]))"):
-def detect_anomalies(query: str = "1 - rate(node_cpu_seconds_total{mode="idle"}[5m])"):
-
- 
+def detect_anomalies(query: str = "sum(rate(node_cpu_seconds_total[5m]))"):
     # Fetch last 1 hour of metric data
     metric_data = prom.custom_query_range(
         query=query,
@@ -56,15 +40,25 @@ def detect_anomalies(query: str = "1 - rate(node_cpu_seconds_total{mode="idle"}[
     # Resample to ensure uniform 1-minute intervals and fill gaps
     df = df.set_index("timestamp").resample("1min").mean().ffill()
 
-    # Train/run lightweight anomaly detection
-    model = IsolationForest(contamination=0.05, random_state=42)
-    df["anomaly"] = model.fit_predict(df[["value"]])
+    # 1. Anomaly detection
+    iso_model = IsolationForest(contamination=0.05, random_state=42)
+    df["anomaly"] = iso_model.fit_predict(df[["value"]])
 
-    anomalies = df[df["anomaly"] == -1].to_dict(orient="records")
+    # 2. Forecast next CPU value (Linear Regression over time steps)
+    X = np.arange(len(df)).reshape(-1, 1)
+    y = df["value"].values
+    reg_model = LinearRegression().fit(X, y)
+    predicted_next_cpu = float(reg_model.predict([[len(df)]])[0])
 
-    #is_anomaly = 1 if latest_prediction == -1 else 0
-    is_anomaly = 1 if anomalies == -1 else 0
+    # Update Prometheus Gauges
+    latest_is_anomaly = 1 if df["anomaly"].iloc[-1] == -1 else 0
+    ANOMALY_SCORE.set(latest_is_anomaly)
+    PREDICTED_CPU.set(predicted_next_cpu)
 
-    ANOMALY_SCORE.set(is_anomaly)
-    return {"anomaly_count": len(anomalies), "anomalies": anomalies}
-
+    anomalies = df[df["anomaly"] == -1].reset_index().to_dict(orient="records")
+    return {
+        "predicted_cpu": predicted_next_cpu,
+        "latest_anomaly": latest_is_anomaly,
+        "anomaly_count": len(anomalies),
+        "anomalies": anomalies,
+    }
