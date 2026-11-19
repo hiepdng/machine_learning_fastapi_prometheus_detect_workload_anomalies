@@ -19,25 +19,20 @@ File structure:
 └── prometheus.yml  
 
 **Setup:**  
-Run the below commands to download the demo repository and run the Docker containers.  
+Run the below commands to download the demo repository and run this setup.  
 ```
 #Downloading the repository
-git clone git@github.com:hiepdng/monitoring_metric_logs_traces_profiles_with_prometheus_grafana_stack.git
+git clone git@github.com:hiepdng/machine_learning_fastapi_prometheus_detect_workload_anomalies.git
 
 #Creating volumes
 cd monitoring_metric_logs_traces_profiles_with_prometheus_grafana_stack
+mkdir app
 mkdir prometheus_data
 sudo chown -R nobody:nogroup prometheus_data
+mkdir prometheus_node_data
+sudo chown -R nobody:nogroup prometheus_node_data
 mkdir grafana_data
 sudo chown -R 472:472 grafana_data
-mkdir loki_data
-sudo chown -R 10001:10001 loki_data
-mkdir alloy_data
-sudo chown -R 473:473 alloy_data
-mkdir tempo_data
-sudo chown -R 10001:10001 tempo_data
-mkdir pyroscope_data
-sudo chown -R 10001:10001 pyroscope_data
 
 #Running containers
 docker compose up -d
