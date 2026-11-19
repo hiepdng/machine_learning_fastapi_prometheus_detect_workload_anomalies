@@ -1,0 +1,71 @@
+services:
+  ml-api:
+    image: my-fastapi-uvicorm-app:latest
+    container_name: ml-api
+    build:
+      context: ./app
+      dockerfile: Dockerfile.app
+      args:
+        APP_ENV: development
+    ports:
+      - "8000:8000"
+
+  prometheus:
+    image: prom/prometheus:v3.15.1
+    container_name: prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus_data:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=15d
+      - --web.enable-lifecycle
+      - --web.enable-remote-write-receiver
+      - --enable-feature=exemplar-storage
+      - --enable-feature=native-histograms
+    ports:
+      - "9090:9090"
+
+  prometheus_node:
+    image: prom/prometheus:v3.15.1
+    container_name: prometheus_node
+    restart: unless-stopped
+    volumes:
+      - ./prometheus_node.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus_node_data:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    ports:
+      - "9091:9090"
+
+  grafana:
+    image: grafana/grafana-enterprise:13.0.12-ubuntu
+    container_name: grafana
+    restart: unless-stopped
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    volumes:
+      - ./grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - ./grafana_data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+
+  node_exporter:
+    image: prom/node-exporter:v1.12.1
+    container_name: node_exporter
+    restart: unless-stopped
+    volumes:
+      - /:/rootfs:ro,rslave
+    command:
+      - --path.rootfs=/rootfs
+      - --collector.systemd
+      - --collector.processes
+      - --collector.interrupts
+      - --collector.tcpstat
+    ports:
+      - 9100:9100
+      
