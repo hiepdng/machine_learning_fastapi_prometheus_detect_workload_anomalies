@@ -37,3 +37,8 @@ sudo chown -R 472:472 grafana_data
 #Running containers
 docker compose up -d
 ```
+**Note:**  
+- The `app` directory contains all need files to build ml-api, which is used to calculate anomalies and predictions of workload (CPU).  
+- There are two Prometheus instances:  
+  - The `prometheus` is for scraping ml-api's metrics for Grafana to pull.  
+  - The `prometheus_node is for scraping node-exporter's metrics for ml-api to pull.  
