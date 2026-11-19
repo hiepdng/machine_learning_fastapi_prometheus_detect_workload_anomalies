@@ -47,7 +47,7 @@ docker compose up -d
 Go to http://localhost:3000/ to access your local Grafana webpage and monitor Drilldown Metrics. It will show `ml_cpu_anomaly_flag` and `ml_cpu_predicted_value`qq
 
 To view specific container webpages:  
-- ml-api: http://localhost:8000/
+- ml-api: http://localhost:8000/, http://localhost:8000/docs, http://localhost:8000/redoc
 - Node-exporter: http://localhost:9100/ or http://localhost:9100/metrics
 - Prometheus: http://localhost:9090/
 - Prometheus_node: http://localhost:9091/
