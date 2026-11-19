@@ -18,7 +18,7 @@ prom = PrometheusConnect(url="http://prometheus_node:9090", disable_ssl=True)
 metrics_app = make_asgi_app()
 app.mount("/metrics", metrics_app)
 
-@app.get("/detect-anomalies")
+@app.get("/")
 def detect_anomalies(query: str = "sum(rate(node_cpu_seconds_total[5m]))"):
     # Fetch last 1 hour of metric data
     metric_data = prom.custom_query_range(
