@@ -41,4 +41,27 @@ docker compose up -d
 - The `app` directory contains all need files to build ml-api, which is used to calculate anomalies and predictions of workload (CPU).  
 - There are two Prometheus instances:  
   - The `prometheus` is for scraping ml-api's metrics for Grafana to pull.  
-  - The `prometheus_node is for scraping node-exporter's metrics for ml-api to pull.  
+  - The `prometheus_node is for scraping node-exporter's metrics for ml-api to pull.
+ 
+**Access Grafana web:**  
+Go to http://localhost:3000/ to access your local Grafana webpage and monitor Drilldown Metrics. It will show `ml_cpu_anomaly_flag` and `ml_cpu_predicted_value`qq
+
+To view specific container webpages:  
+- ml-api: http://localhost:8000/
+- Node-exporter: http://localhost:9100/ or http://localhost:9100/metrics
+- Prometheus: http://localhost:9090/
+- Prometheus_node: http://localhost:9091/
+<br>
+
+**View Grafana Drilldown Metrics, Logs, Traces and Profiles:**  
+To view a corresponding page:
+- Go to http://localhost:3000/
+- Click on **Drilldown** ➔ **Metrics**, **Logs**, **Traces** or **Profiles**
+- Note:
+  - **Metrics** requires **Prometheus** data source.
+  - **Logs** requires **Loki** data source.
+  - **Traces** requires **Tempo** data source.
+  - **Profiles** required **Pyroscope** data source.
+  
+  All of the required data sources are included in the grafana-datasources.yaml file.  If a data source is missing or if you want to modify data source options,  click on **Connections**➔**Data sources**➔**Add new data source** and enter properly options.  
+<br>
