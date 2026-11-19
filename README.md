@@ -1,2 +1,2 @@
-# machine_learning_prometheus_detect_workload_anomalies
-Detecting Workload anomalies with Prometheus and Machine Learning
+## Machine learning for workload anomaly detection with Prometheus 
+
