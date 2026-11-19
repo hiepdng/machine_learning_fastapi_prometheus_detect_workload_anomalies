@@ -1,4 +1,4 @@
-## Machine Learning for CPU Anomaly Detection and Prediction with Prometheus, FastAPI and Grafana 
+## Workload Anomaly Detection and Prediction with FastAPI, Prometheus, and Machine Learning
 
 
 Applying machine learning to node_cpu_seconds_total means using time-series algorithms—such as anomaly detection, forecasting, and workload clustering—on CPU utilization rates derived from this Prometheus Node Exporter metric. Rather than relying on rigid static thresholds (like alerting whenever CPU passes 80%), ML models learn normal cyclical patterns across CPU modes to flag unusual behavior and predict future resource exhaustion  
