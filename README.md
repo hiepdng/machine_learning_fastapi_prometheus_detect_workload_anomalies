@@ -1,7 +1,9 @@
 ## Workload Anomaly Detection and Prediction with FastAPI, Prometheus, and Machine Learning
 
 
-Applying machine learning to node_cpu_seconds_total means using time-series algorithms—such as anomaly detection, forecasting, and workload clustering—on CPU utilization rates derived from this Prometheus Node Exporter metric. Rather than relying on rigid static thresholds (like alerting whenever CPU passes 80%), ML models learn normal cyclical patterns across CPU modes to flag unusual behavior and predict future resource exhaustion  
+Applying machine learning to node_cpu_seconds_total means using time-series algorithms—such as anomaly detection, forecasting, and workload clustering—on CPU utilization rates derived from this Prometheus Node Exporter metric. Rather than relying on rigid static thresholds (like alerting whenever CPU passes 80%), ML models learn normal cyclical patterns across CPU modes to flag unusual behavior and predict future resource exhaustion.  
+
+Machine learning (ML) detects CPU workload anomalies by learning dynamic baselines of normal system behavior rather than relying on rigid, static thresholds. This helps infrastructure teams catch subtle or context-dependent issues early while reducing false alarms.
 
 This is a complete setup using Docker inmages, included prom/prometheus, prom/node-exporter, grafana and python, along with FastAPI  Python web framework.  
 
@@ -17,6 +19,7 @@ File structure:
 ├── prometheus_node_data/  
 ├── prometheus_node.yml  
 └── prometheus.yml  
+<br>
 
 **Setup:**  
 Run the below commands to download the demo repository and run this setup.  
@@ -42,9 +45,11 @@ docker compose up -d
 - There are two Prometheus instances:  
   - The `prometheus` is for scraping ml-api's metrics for Grafana to pull.  
   - The `prometheus_node is for scraping node-exporter's metrics for ml-api to pull.
- 
+ <br>
+
 **Access Grafana web:**  
-Go to http://localhost:3000/ to access your local Grafana webpage and monitor Drilldown Metrics. It will show `ml_cpu_anomaly_flag` and `ml_cpu_predicted_value`qq
+Go to http://localhost:3000/ to access your local Grafana webpage and monitor Drilldown Metrics. It will show `ml_cpu_anomaly_flag` and `ml_cpu_predicted_value` plots to view.    
+
 
 To view specific container webpages:  
 - ml-api: http://localhost:8000/, http://localhost:8000/docs, http://localhost:8000/redoc
@@ -53,15 +58,4 @@ To view specific container webpages:
 - Prometheus_node: http://localhost:9091/
 <br>
 
-**View Grafana Drilldown Metrics, Logs, Traces and Profiles:**  
-To view a corresponding page:
-- Go to http://localhost:3000/
-- Click on **Drilldown** ➔ **Metrics**, **Logs**, **Traces** or **Profiles**
-- Note:
-  - **Metrics** requires **Prometheus** data source.
-  - **Logs** requires **Loki** data source.
-  - **Traces** requires **Tempo** data source.
-  - **Profiles** required **Pyroscope** data source.
-  
-  All of the required data sources are included in the grafana-datasources.yaml file.  If a data source is missing or if you want to modify data source options,  click on **Connections**➔**Data sources**➔**Add new data source** and enter properly options.  
-<br>
+
