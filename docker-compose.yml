@@ -64,8 +64,8 @@ services:
       - --path.rootfs=/rootfs
       - --collector.systemd
       - --collector.processes
-      - --collector.interrupts
+      #- --collector.interrupts
       - --collector.tcpstat
     ports:
       - 9100:9100
-      
+
